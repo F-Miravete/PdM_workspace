@@ -123,13 +123,13 @@ int main(void)
 		  HAL_Delay(25);
 	  }
 
-	  HAL_GPIO_WritePin(GPIOB, Led[i], 1);   // Set Pin
+	  HAL_GPIO_WritePin(GPIOB, Led[i], 1);  // Set Pin
 	  HAL_Delay(200);						// Retardo
 	  HAL_GPIO_WritePin(GPIOB, Led[i], 0);	// Reset Pin
 	  HAL_Delay(200);						// Retardo
-	  i = i + direction;
-	  if (i >= 3) i = 0;
-	  if (i <= -1) i = 2;
+	  i = i + direction;					// Incremento/Decremento segun corresponda
+	  if (i >= 3) i = 0;					// Verifica valor maximo del indice del vector
+	  if (i <= -1) i = 2;					// Verifica valor minimo del indice del vector
 
     /* USER CODE BEGIN 3 */
   }
