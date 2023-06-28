@@ -94,13 +94,15 @@ int main(void)
   // Defino vector de 3 elementos con las direcciones de los pines 7, 8 y 9 del port B y variable aux.
 
   uint16_t Led[3] = {0x0080 , 0x0100 , 0x0200};
-  short int i;
+  short int i, direction;
 
-  // Pongo en "0" las tres salidas, GPIOB_7, GPIOB_8 y GPIOB_9
+  // Pongo en "0" las tres salidas, GPIOB_PIN_7, GPIOB_PIN_8 y GPIOB_PIN_9
   for (i=0;i<3;i++)
   {
 	  HAL_GPIO_WritePin(GPIOB, Led[i], 0);
   }
+  i = 0;
+  direction = 1;
 
   /* USER CODE END 2 */
 
@@ -109,13 +111,25 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	  for (i=0;i<3;i++)
+
+
+	  if (HAL_GPIO_ReadPin(GPIOC, B1_Pin) == 0)
 	  {
-		  HAL_GPIO_TogglePin(GPIOB, Led[i]);    // Set Pin
-		  HAL_Delay(500);						// Retardo
-		  HAL_GPIO_TogglePin(GPIOB, Led[i]);	// Reset Pin
-		  HAL_Delay(500);						// Retardo
+		  HAL_GPIO_TogglePin(GPIOA, LD2_Pin);
+		  if (HAL_GPIO_ReadPin(GPIOA, LD2_Pin))
+			  direction = -1;
+		  else
+			  direction = 1;
+		  HAL_Delay(25);
 	  }
+
+	  HAL_GPIO_WritePin(GPIOB, Led[i], 1);   // Set Pin
+	  HAL_Delay(200);						// Retardo
+	  HAL_GPIO_WritePin(GPIOB, Led[i], 0);	// Reset Pin
+	  HAL_Delay(200);						// Retardo
+	  i = i + direction;
+	  if (i >= 3) i = 0;
+	  if (i <= -1) i = 2;
 
     /* USER CODE BEGIN 3 */
   }
