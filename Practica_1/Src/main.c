@@ -92,44 +92,53 @@ int main(void)
 
   // ********************************************************************************************************
   // Defino vector de 3 elementos con las direcciones de los pines 7, 8 y 9 del port B y variable aux.
+  // Las direcciones se encuentran definidas en Drivers/STM32F4xx_HAL_Driver/Inc/STM32F4xx_hal_gpio.h
+  // ********************************************************************************************************
 
   uint16_t Led[3] = {0x0080 , 0x0100 , 0x0200};
-  short int i, direction;
+  short int i, direction, flag;
 
   // Pongo en "0" las tres salidas, GPIOB_PIN_7, GPIOB_PIN_8 y GPIOB_PIN_9
   for (i=0;i<3;i++)
   {
 	  HAL_GPIO_WritePin(GPIOB, Led[i], 0);
   }
+  // inicializo "i" : contador aux.
+  // inicializo "direction" : me indica el sentido de la secuencia de encendido de los leds, 1=>7,8,9 / -1=>9,8,7
+  // inicializo flag detecta flanco pulsador
   i = 0;
   direction = 1;
+  flag = 0;
 
-  /* USER CODE END 2 */
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
+  // Bucle ppal.
   while (1)
   {
-    /* USER CODE END WHILE */
+  	  if (flag == 0)
+  	  {
+		  if (HAL_GPIO_ReadPin(GPIOC, B1_Pin) == 0)		// Consulto si Pulsador Azul esta presionado
+		  {
+			  flag = 1;									// Se detecto flanco descendente en pulsador
+			  HAL_GPIO_TogglePin(GPIOA, LD2_Pin);		// Invierto LD2 (LD2 me indica el sentido de la secuencia)
+			  if (HAL_GPIO_ReadPin(GPIOA, LD2_Pin))		// Leo LD2 y defino valor de "direction"
+				  direction = -1;
+			  else
+				  direction = 1;
+			  HAL_Delay(25);							// Demora filtro antirebote
+		  }
+  	  }
+  	  else
+  	  {
+  		  if (HAL_GPIO_ReadPin(GPIOC, B1_Pin) == 1)		// Consulto si pulsador se liberò
+  			  flag = 0;									// Se detecto flanco ascendente en pulsador
+  	  }
 
-
-	  if (HAL_GPIO_ReadPin(GPIOC, B1_Pin) == 0)
-	  {
-		  HAL_GPIO_TogglePin(GPIOA, LD2_Pin);
-		  if (HAL_GPIO_ReadPin(GPIOA, LD2_Pin))
-			  direction = -1;
-		  else
-			  direction = 1;
-		  HAL_Delay(25);
-	  }
-
-	  HAL_GPIO_WritePin(GPIOB, Led[i], 1);  // Set Pin
-	  HAL_Delay(200);						// Retardo
-	  HAL_GPIO_WritePin(GPIOB, Led[i], 0);	// Reset Pin
-	  HAL_Delay(200);						// Retardo
-	  i = i + direction;					// Incremento/Decremento segun corresponda
-	  if (i >= 3) i = 0;					// Verifica valor maximo del indice del vector
-	  if (i <= -1) i = 2;					// Verifica valor minimo del indice del vector
+	  HAL_GPIO_WritePin(GPIOB, Led[i], 1);  		// Set Pin
+	  HAL_Delay(200);								// Retardo
+	  HAL_GPIO_WritePin(GPIOB, Led[i], 0);			// Reset Pin
+	  HAL_Delay(200);								// Retardo
+	  i = i + direction;							// Incremento/Decremento segun corresponda
+	  if (i >= 3) i = 0;							// Verifica valor maximo del indice del vector
+	  if (i <= -1) i = 2;							// Verifica valor minimo del indice del vector
 
     /* USER CODE BEGIN 3 */
   }
