@@ -96,19 +96,17 @@ int main(void)
   // ********************************************************************************************************
 
   uint16_t Led[3] = {0x0080 , 0x0100 , 0x0200};
-  short int i, direction, flag;
+
+  // inicializo "i" : contador aux.
+  // inicializo "direction" : me indica el sentido de la secuencia de encendido de los leds, 1=>7,8,9 / -1=>9,8,7
+  // inicializo flag detecta flanco pulsador
+  short int i=0, direction=1, flag=0;
 
   // Pongo en "0" las tres salidas, GPIOB_PIN_7, GPIOB_PIN_8 y GPIOB_PIN_9
   for (i=0;i<3;i++)
   {
 	  HAL_GPIO_WritePin(GPIOB, Led[i], 0);
   }
-  // inicializo "i" : contador aux.
-  // inicializo "direction" : me indica el sentido de la secuencia de encendido de los leds, 1=>7,8,9 / -1=>9,8,7
-  // inicializo flag detecta flanco pulsador
-  i = 0;
-  direction = 1;
-  flag = 0;
 
   // Bucle ppal.
   while (1)
