@@ -106,13 +106,14 @@ int main(void)
   // ********************************************************************************************************
   // Defino 3 retardos con sus respectivas duraciones: 250 ms , 500 ms , 1000 ms
   // ********************************************************************************************************
-  delay_t retardo_1 , retardo_2 , retardo_3;
-  tick_t duration_1 = 250;
-  tick_t duration_2 = 500;
-  tick_t duration_3 = 1000;
-  delayInit(&retardo_1, duration_1);
-  delayInit(&retardo_2, duration_2);
-  delayInit(&retardo_3, duration_3);
+  delay_t retardo[CANT];
+  tick_t duration[CANT] = {250 , 500 , 1000};
+
+  for(i=0;i<CANT;i++)
+  {
+	  delayInit(&retardo[i], duration[i]);
+  }
+
 
   /* USER CODE END 2 */
 
@@ -120,13 +121,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if(delayRead(&retardo_1))
-		  HAL_GPIO_TogglePin(GPIOB, Led[0]);
-	  if(delayRead(&retardo_2))
-		  HAL_GPIO_TogglePin(GPIOB, Led[1]);
-	  if(delayRead(&retardo_3))
-		  HAL_GPIO_TogglePin(GPIOB, Led[2]);
-
+	  for(i=0;i<CANT;i++)
+	  {
+		  if(delayRead(&retardo[i]))
+			  HAL_GPIO_TogglePin(GPIOB, Led[i]);
+	  }
   }
   /* USER CODE END 3 */
 }
