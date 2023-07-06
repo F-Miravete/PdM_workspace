@@ -104,7 +104,7 @@ int main(void)
   }
 
   // ********************************************************************************************************
-  // Defino 3 retardos con sus respectivas duraciones: 100 ms , 500 ms , 1000 ms
+  // Defino 3 retardos con sus respectivas duraciones: 250 ms , 500 ms , 1000 ms
   // ********************************************************************************************************
   delay_t retardo_1 , retardo_2 , retardo_3;
   tick_t duration_1 = 250;
@@ -266,6 +266,10 @@ void delayInit( delay_t * delay, tick_t duration )
 	if(delay != NULL )
 	{
 		delay->running = false;
+		if(duration > DURATION_MAX)
+			duration = DURATION_MAX;
+		if(duration < DURATION_MIN)
+			duration = DURATION_MIN;
 		delay->duration = duration;
 	}
 }
@@ -304,6 +308,10 @@ void delayWrite( delay_t * delay, tick_t duration )
 {
 	if(delay != NULL)
 	{
+		if(duration > DURATION_MAX)
+			duration = DURATION_MAX;
+		if(duration < DURATION_MIN)
+			duration = DURATION_MIN;
 		delay->duration = duration;
 	}
 }

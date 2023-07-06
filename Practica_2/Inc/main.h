@@ -88,7 +88,15 @@ void delayWrite( delay_t * delay, tick_t duration );
 #define LED03_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
+// *****************************************************************************
+// Define rangos de valores
+// CANT : cantidad de leds a manejar
+// DURATION_MAX : valor maximo de un retardo en [ms], 86400000 equivale a 1 dia
+// DURATION_MIN : valor minimo de un retardo en [ms]
+// *****************************************************************************
 #define CANT 3
+#define DURATION_MAX 86400000
+#define DURATION_MIN 0
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
