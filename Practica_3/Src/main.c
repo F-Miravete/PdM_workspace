@@ -93,7 +93,9 @@ int main(void)
 
   /* USER CODE END 2 */
 
-  // arranco a codear
+  //*********************************************************************************************************
+  // Defino vector con salidas GPIO de 3 leds y los pongo en cero
+  //*********************************************************************************************************
   short int i=0;
   uint16_t Led[CANT] = {0x0080 , 0x0100 , 0x0200};
   for(i=0;i<CANT;i++)
@@ -101,30 +103,29 @@ int main(void)
   	 HAL_GPIO_WritePin(GPIOB, Led[i], 0);
   }
 
-  // ********************************************************************************************************
-  // Defino 3 retardos con sus respectivas duraciones: 250 ms , 500 ms , 1000 ms
-  // ********************************************************************************************************
+  //*********************************************************************************************************
+  // Defino vector con retardos y vector con sus respectivas duraciones: 250 ms , 500 ms , 1000 ms
+  //*********************************************************************************************************
   delay_t retardo[CANT];
   tick_t duration[CANT] = {250 , 500 , 1000};
 
+  //*********************************************************************************************************
+  // Inicializo vector de retardos
+  //*********************************************************************************************************
   for(i=0;i<CANT;i++)
   {
 	  delayInit(&retardo[i], duration[i]);
   }
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
+	  // Implementa los 3 retardos y togglea cada salida del vector Led[] cuando se cumple el tiempo
 	  for(i=0;i<CANT;i++)
 	  {
 	  	if(delayRead(&retardo[i]))
 	  		HAL_GPIO_TogglePin(GPIOB, Led[i]);
 	  }
-    /* USER CODE BEGIN 3 */
   }
-  /* USER CODE END 3 */
 }
 
 /**

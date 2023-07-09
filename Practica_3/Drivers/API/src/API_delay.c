@@ -1,26 +1,16 @@
-// ********************************************************************************************************
-  // Defino vector de 3 elementos con las direcciones de los pines 7, 8 y 9 del port GPIOB
-  // pin 7 -> Led01  /  pin 8 -> Led02  /  pin 9 -> Led03
-  // Las direcciones se encuentran definidas en Drivers/STM32F4xx_HAL_Driver/Inc/STM32F4xx_hal_gpio.h
-  // Inicializo las 3 salidas del port GPIOB en 0
-  // ********************************************************************************************************
+//**********************************************************************************************************
+//
+// Practica 3 - Programacion de Microcontroladores (CESE 2023)
+// Titulo: Modulo API_delay (SOURCE)
+// Autor: F.D.M.
+//
+//**********************************************************************************************************
+
 #include "API_delay.h"
 
-static void API_Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
-  /* USER CODE END Error_Handler_Debug */
-}
-
-
-
 //*******************************************************************************************************************
-// delayInit: Inicializa retardo cargando su valor en [ms] y su flag running en 0
+// Funcion: delayInit()
+// Inicializa retardo cargando su valor en [ms] y su flag running en 0
 //*******************************************************************************************************************
 void delayInit( delay_t * delay, tick_t duration )
 {
@@ -37,9 +27,10 @@ void delayInit( delay_t * delay, tick_t duration )
 }
 
 //*******************************************************************************************************************
-// delayRead: Implementa el retardo.
-// 			  Si el retardo no esta corriendo lo pone a correr
-//			  Si el retardo esta corriendo compara el tiempo trancurrido y devuelve true si el tiempo se ha cumplido
+// Funcion: delayRead()
+// Implementa un retardo NO bloqueante.
+// 		Si el retardo no  esta corriendo lo pone a correr
+//		Si el retardo esta corriendo compara el tiempo trancurrido y devuelve true si el tiempo se ha cumplido
 //*******************************************************************************************************************
 bool_t delayRead( delay_t * delay )
 {
@@ -65,7 +56,8 @@ bool_t delayRead( delay_t * delay )
 }
 
 //*******************************************************************************************************************
-// delayWrite: Cambia el tiempo de duracion de un retardo existente
+// Funcion: delayWrite()
+// Cambia el tiempo de duracion de un retardo existente
 //*******************************************************************************************************************
 void delayWrite( delay_t * delay, tick_t duration )
 {
@@ -80,5 +72,17 @@ void delayWrite( delay_t * delay, tick_t duration )
 	else API_Error_Handler();
 }
 
+//**********************************************************************************************************
+// Funcion: API_Error_Handler()
+// Manejo de errores por pasaje de parametros en modulo API_delay, si existe un error enciende led de
+// usuario LD2
+//**********************************************************************************************************
+void API_Error_Handler(void)
+{
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
 
+	while (1)
+	{
+	}
+}
 
