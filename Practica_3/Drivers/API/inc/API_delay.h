@@ -11,6 +11,9 @@
 #define CANT 3						// Define macro cantidad de leds
 #define DURATION_MAX 86400000		// Define macro retardo maximo en [ms], equivale a un dia
 #define DURATION_MIN 0				// Define macro retardo minimo en [ms], cero
+#define DURATION_1 250				// Define macro retardo Led 1 en [ms]
+#define DURATION_2 500				// Define macro retardo Led 2 en [ms]
+#define DURATION_3 1000				// Define macro retardo Led 3 en [ms]
 
 #include "stm32f4xx_hal.h"
 #include <stdint.h>

@@ -107,7 +107,7 @@ int main(void)
   // Defino vector con retardos y vector con sus respectivas duraciones: 250 ms , 500 ms , 1000 ms
   //*********************************************************************************************************
   delay_t retardo[CANT];
-  tick_t duration[CANT] = {250 , 500 , 1000};
+  tick_t duration[CANT] = {DURATION_1 , DURATION_2 , DURATION_3};
 
   //*********************************************************************************************************
   // Inicializo vector de retardos
