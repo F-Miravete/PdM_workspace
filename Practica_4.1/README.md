@@ -20,7 +20,7 @@ Implementar un FSM (Finite State Machine) para trabajar con anti-rebotes de tecl
 La FSM permite leer el estado del pulsador de la placa NUCLEO-F401RE y genera acciones o eventos ante un flanco descendente o ascendente.
 
 La FSM tiene el siguiente esquema
-(FSM_Pract4.jpg)
+![alt text](FSM_Pract4.jpg "Placa")
  
 El tiempo de anti-rebote es de 40 ms y se utiliza un retardo no bloqueante implementado en el modulo API_delay.
 Cuando se detecta pulsador presionado se "togglea" el led 1 (pin 7) y cuando se detecta pulsador liberado
