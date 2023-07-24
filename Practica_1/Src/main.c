@@ -99,11 +99,12 @@ int main(void)
 
   // inicializo "i" : contador aux.
   // inicializo "direction" : me indica el sentido de la secuencia de encendido de los leds, 1=>7,8,9 / -1=>9,8,7
-  // inicializo flag detecta flanco pulsador
-  short int i=0, direction=1, flag=0;
+  // inicializo "flag" : detecta flanco pulsador
+  // inicializo "cant": cantidad de leds
+  short int i=0, direction=1, flag=0, cant = 3;
 
   // Pongo en "0" las tres salidas, GPIOB_PIN_7, GPIOB_PIN_8 y GPIOB_PIN_9
-  for (i=0;i<3;i++)
+  for (i=0;i<cant;i++)
   {
 	  HAL_GPIO_WritePin(GPIOB, Led[i], 0);
   }
@@ -135,7 +136,7 @@ int main(void)
 	  HAL_GPIO_WritePin(GPIOB, Led[i], 0);			// Reset Pin
 	  HAL_Delay(200);								// Retardo
 	  i = i + direction;							// Incremento/Decremento segun corresponda
-	  if (i >= 3) i = 0;							// Verifica valor maximo del indice del vector
+	  if (i >= cant) i = 0;							// Verifica valor maximo del indice del vector
 	  if (i <= -1) i = 2;							// Verifica valor minimo del indice del vector
 
     /* USER CODE BEGIN 3 */
