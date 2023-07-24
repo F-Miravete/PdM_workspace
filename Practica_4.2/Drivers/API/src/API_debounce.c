@@ -11,7 +11,7 @@
 
 static delay_t retardo;
 static tick_t duration = DURATION_DELAY;
-extern debounceState_t actualState;
+static debounceState_t actualState;
 static bool_t estadoBoton;
 
 //**********************************************************************************************************
@@ -24,10 +24,10 @@ static void buttonReleased();								// Invierte el estado del LED3
 // Funcion: debounceFSM_init()
 // Inicializa la maquina de estados con su estado inicial
 //**********************************************************************************************************
-void debounceFSM_init(debounceState_t fsm)
+void debounceFSM_init()
 {
 	delayInit(&retardo, duration);
-	actualState = BUTTON_UP;	// carga el estado inicial
+	actualState = BUTTON_UP;							// carga el estado inicial
 	estadoBoton = false;
 }
 
@@ -36,9 +36,9 @@ void debounceFSM_init(debounceState_t fsm)
 // Actualiza la maquina de estados: lee las entradas, resuelve la lógica de transicion de estados y
 // actualiza salidas
 //**********************************************************************************************************
-void debounceFSM_update(debounceState_t fsm)
+void debounceFSM_update()
 {
-	switch (fsm)										// Consulta Estado FSM
+	switch (actualState)								// Consulta Estado FSM
 	{													//
 	case BUTTON_UP:										// Si BOTON Arriba ==>
 		if(HAL_GPIO_ReadPin(GPIOC, B1_Pin)==0)			// Consulta si se presionò el pulsador B1
@@ -76,7 +76,7 @@ void debounceFSM_update(debounceState_t fsm)
 		break;											//
 	default:											//
 		// CONTROL de ERRORES							//
-		debounceFSM_init(fsm);							// Por default inicia FSM
+		debounceFSM_init(); 							// Por default inicia FSM
 		break;
 	}
 }

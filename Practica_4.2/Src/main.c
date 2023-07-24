@@ -47,11 +47,6 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 
-//*********************************************************************************************************
-// Defino variable global estado de MEF
-//*********************************************************************************************************
-
-debounceState_t actualState;
 
 /* USER CODE END PV */
 
@@ -75,9 +70,9 @@ static void MX_USART2_UART_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	delay_t demora;
-	tick_t duracion = TIEMPO_1;
-	bool_t f_parpadeo = false;
+	delay_t demora;					// Defino Delay para parpadeo de Led 2
+	tick_t duracion = TIEMPO_1;		// Defino Tiempo inicial con el que arrancara el parpadeo del led 2
+	bool_t f_parpadeo = false;		// Defino variable auxiliar utilizada para seleccionar tiempo de parpadeo
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -111,29 +106,31 @@ int main(void)
   HAL_GPIO_WritePin(GPIOB, LED03_Pin, 0);
 
   //*********************************************************************************************************
-  // Inicializo FSM
+  // Inicializo FSM y retardo para parpadeo
   //*********************************************************************************************************
-  debounceFSM_init(actualState);
+  debounceFSM_init();
   delayInit(&demora, duracion);
+
+  // Bucle principal
   while (1)
   {
-	  debounceFSM_update(actualState);
-	  if(delayRead(&demora))
-		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-	  if(readKey())
-	  {
-		  if(f_parpadeo == false)
-		  {
-			  duracion = TIEMPO_2;
-			  f_parpadeo = true;
-		  }
-		  else
-		  {
-			  duracion = TIEMPO_1;
-			  f_parpadeo = false;
-		  }
-		  delayWrite(&demora, duracion);
-	  }
+	  debounceFSM_update();									// Actualiza FSM de anti-robote tecla B1
+	  if(delayRead(&demora))								// Implementa retardo no bloqueante para parpadeo de led 2
+		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);		// Togglea led 2
+	  if(readKey())											// -------------------------------------------------------
+	  {														// Verifica si la tecla B1 paso por flanco descendente
+		  if(f_parpadeo == false)							//		En caso positivo cambia el tiempo del retardo
+		  {													//		de parpadeo del led 2 (pasa de TIEMPO_1 a TIEMPO_2)
+			  duracion = TIEMPO_2;							//		y vice-versa.
+			  f_parpadeo = true;							//
+		  }													//
+		  else												//
+		  {													//
+			  duracion = TIEMPO_1;							//
+			  f_parpadeo = false;							//
+		  }													//
+		  delayWrite(&demora, duracion);					//
+	  }														// -------------------------------------------------------
   }
 }
 
