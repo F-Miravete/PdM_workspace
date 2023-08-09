@@ -104,7 +104,13 @@ int main(void)
 	  Error_Handler();
 
   //*********************************************************************************************************
-  // Inicializo FSM operacion del Genrador de tonos y la demora para el parpadeo del LD2
+  // Inicializo I2S
+  //*********************************************************************************************************
+  if(i2sInit() != true)
+  	  Error_Handler();
+
+  //*********************************************************************************************************
+  // Inicializo FSM operacion del Genrador de tonos
   //*********************************************************************************************************
   waveGenFSM_init();
   delayInit(&demora, duracion);
@@ -146,9 +152,9 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-  RCC_OscInitStruct.PLL.PLLM = 16;
-  RCC_OscInitStruct.PLL.PLLN = 336;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+  RCC_OscInitStruct.PLL.PLLM = 8;
+  RCC_OscInitStruct.PLL.PLLN = 84;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 7;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {

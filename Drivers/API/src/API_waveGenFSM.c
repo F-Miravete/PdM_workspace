@@ -29,6 +29,7 @@ static waveGenFSMstate_t actualState;
 void waveGenFSM_init()
 {
 	actualState = STOP;
+	HAL_NVIC_DisableIRQ(SPI2_IRQn);
 }
 
 void waveGenFSM_update()
@@ -45,6 +46,7 @@ void waveGenFSM_update()
 			if(strstr((const char*)sComm, (const char*)comm_play))
 			{
 				actualState = PLAY;
+				HAL_NVIC_EnableIRQ(SPI2_IRQn);
 				HAL_GPIO_TogglePin(LED03_GPIO_Port, LED03_Pin);
 			}
 			else
@@ -57,6 +59,7 @@ void waveGenFSM_update()
 			if(strstr((const char*)sComm, (const char*)comm_stop))
 			{
 				actualState = STOP;
+				HAL_NVIC_DisableIRQ(SPI2_IRQn);
 				HAL_GPIO_TogglePin(LED03_GPIO_Port, LED03_Pin);
 			}
 		break;
