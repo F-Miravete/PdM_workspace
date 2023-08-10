@@ -1,21 +1,29 @@
-/*
- * API_i2s.c
- *
- *  Created on: Aug 9, 2023
- *      Author: z002m07j
- */
+//**********************************************************************************************************
+//
+// Programacion de Microcontroladores (CESE 2023)
+// Titulo: MODULO I2S
+// Autor: F.D.M.
+//
+//**********************************************************************************************************
 
 #include "API_i2s.h"
 #include "math.h"
 #include "main.h"
 
+static void channelsInit(void);
+static void setChannel(channel * h_ch);
+static void setBufferI2S();
+
 I2S_HandleTypeDef hi2s2;
-int32_t dataRaw[RAW_SIZE * 2];
-int16_t channel1[RAW_SIZE];
-int16_t channel2[RAW_SIZE];
+static int32_t dataBufferI2S[BUFFER_SIZE_MAX];
+static int16_t dataChannel[2][BUFFER_SIZE_MAX];
+static channel channel_0, channel_1;
+static uint16_t freq;
+static uint32_t size_buffer;
 
 bool_t i2sInit()
 {
+  bool_t flag_RET = true;
   hi2s2.Instance = SPI2;
   hi2s2.Init.Mode = I2S_MODE_MASTER_TX;
   hi2s2.Init.Standard = I2S_STANDARD_MSB;
@@ -26,48 +34,119 @@ bool_t i2sInit()
   hi2s2.Init.ClockSource = I2S_CLOCK_PLL;
   hi2s2.Init.FullDuplexMode = I2S_FULLDUPLEXMODE_DISABLE;
   if (HAL_I2S_Init(&hi2s2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  iniciarData();
-  HAL_NVIC_EnableIRQ(SPI2_IRQn);
-  HAL_I2S_Transmit_IT(&hi2s2, (uint16_t*)dataRaw, RAW_SIZE*2);
-  return true;
+	  flag_RET = false;
+  channelsInit();
+  return flag_RET;
 }
 
-void iniciarData(void)
+//**********************************************************************************************************
+// Funcion : void setChannel(channel * h_ch)
+//			 Funcion que genera las formas de onda seleccionadas para cada canal
+//			 Recibe como parametro un puntero del tipo channel que contiene los atributos de cada canal
+//**********************************************************************************************************
+static void setChannel(channel * h_ch)
 {
-	uint16_t i;
-	int32_t aux;
-	for(i=0;i<RAW_SIZE;i++)
+	for(uint16_t i=0;i<size_buffer;i++)
 	{
-		//dataRaw[i] = ((RAW_SIZE-1) - i) * 65;
-		//if(dataRaw[i] > 32767)
-		//	dataRaw[i] = 0;
-		channel1[i] = 16383*sinf(i*2*M_PI/RAW_SIZE);
-		channel2[i] = i*(32767/RAW_SIZE);
-		//if(seno[i]<0)
-		//	dataRaw[i] = ~seno[i] + 1;
-		//else
-			dataRaw[i] = channel1[i];
-			aux = dataRaw[i]<<16;
-			dataRaw[i] = aux;
-			dataRaw[i] = dataRaw[i] + (int32_t)channel2[i];
-		//dataRaw[i] = ~(dataRaw[i]) + 1;
+		if(h_ch->wave_type == SINUSOIDAL)
+			dataChannel[h_ch->n_ch][i] = (h_ch->amplitude/100)*SCALE_SIN_WAVE*sinf(i*2*M_PI/size_buffer);
+		if(h_ch->wave_type == SAWTOOTH)
+			dataChannel[h_ch->n_ch][i] = (h_ch->amplitude/100)*i*(SCALE_SAW_WAVE/size_buffer);
 	}
 }
 
 //**********************************************************************************************************
-// Funcion : void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+// Funcion : void setBufferI2S()
+//			 Funcion que arma el buffer con los datos de los 2 canales para ser enviados por I2S
+//
+//**********************************************************************************************************
+static void setBufferI2S()
+{
+	int32_t aux;
+	for(uint16_t i=0;i<size_buffer;i++)
+	{
+		dataBufferI2S[i] = dataChannel[0][i];
+		aux = dataBufferI2S[i]<<16;
+		dataBufferI2S[i] = aux;
+		dataBufferI2S[i] = dataBufferI2S[i] + (int32_t)dataChannel[1][i];
+	}
+}
+
+//**********************************************************************************************************
+// Funcion : void channelsInit(void)
+//			 Funcion que inicializa los canales del generador de onda
+//			 Canal 0 -> Sinusoidal, 1000Hz, Amplitud 100%
+//			 Canal 1 -> Sawtooth, 1000Hz, Amplitud 100%
+//**********************************************************************************************************
+static void channelsInit(void)
+{
+	freq = 1000;
+	size_buffer = hi2s2.Init.AudioFreq/freq;
+	if(size_buffer > BUFFER_SIZE_MAX)
+		size_buffer = BUFFER_SIZE_MAX;
+	if(size_buffer < BUFFER_SIZE_MIN)
+		size_buffer = BUFFER_SIZE_MIN;
+	channel_0.amplitude = 100;
+	channel_0.n_ch = 0;
+	channel_0.wave_type = SINUSOIDAL;
+	channel_0.freq = freq;
+	channel_1.amplitude = 100;
+	channel_1.n_ch = 1;
+	channel_1.wave_type = SAWTOOTH;
+	channel_1.freq = freq;
+	setChannel(&channel_0);
+	setChannel(&channel_1);
+	setBufferI2S();
+}
+
+//**********************************************************************************************************
+// Funcion :
+//
+//
+//**********************************************************************************************************
+channel* readChannelProperty(uint8_t ch)
+{
+	channel *RET;
+	if(ch == 0)
+		RET = &channel_0;
+	else if(ch == 1)
+			RET = &channel_1;
+		 else RET = NULL;
+	return RET;
+}
+
+
+//**********************************************************************************************************
+// Funcion : void startI2S(void)
+//			 Funcion que arranca el envio de datos por el puerto I2S
+//			 (Habilita la IRQ del periferico I2S)
+//**********************************************************************************************************
+void startI2S(void)
+{
+	HAL_NVIC_EnableIRQ(SPI2_IRQn);
+	HAL_I2S_Transmit_IT(&hi2s2, (uint16_t*)dataBufferI2S, size_buffer*2);
+}
+
+//**********************************************************************************************************
+// Funcion : void stopI2S(void)
+//			 Funcion que detiene el envio de datos por el puerto I2S
+//			 (Deshabilita la IRQ del periferico I2S)
+//**********************************************************************************************************
+void stopI2S(void)
+{
+	HAL_NVIC_DisableIRQ(SPI2_IRQn);
+}
+
+//**********************************************************************************************************
+// Funcion : void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
 //			 Rutina de atencion cuando ingresa interrupcion
-//			 Recibe como parametro: - un puntero a la instancia del puerto USART
+//			 Recibe como parametro: - un puntero a la instancia del periferico I2S
 //**********************************************************************************************************
 void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
 {
 	if(hi2s->Instance == SPI2)
 	{
-		HAL_I2S_Transmit_IT(&hi2s2, (uint16_t*)dataRaw, RAW_SIZE*2);
+		HAL_I2S_Transmit_IT(&hi2s2, (uint16_t*)dataBufferI2S, size_buffer*2);
 		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 	}
 }

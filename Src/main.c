@@ -25,6 +25,8 @@
 
 #include "API_waveGenFSM.h"
 
+#include "API_i2s.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 

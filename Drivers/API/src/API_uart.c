@@ -1,6 +1,6 @@
 //**********************************************************************************************************
 //
-// Practica 5 - Programacion de Microcontroladores (CESE 2023)
+// Programacion de Microcontroladores (CESE 2023)
 // Titulo: UART (SOURCE)
 // Autor: F.D.M.
 //
@@ -9,12 +9,14 @@
 #include "API_delay.h"
 #include "API_uart.h"
 #include "main.h"
-
+#include <stdio.h>
 
 
 UART_HandleTypeDef UartHandle;
 static bool_t newCommand = false;
-static uint8_t rxBuff[10];
+static uint8_t rxBuff[CHARACTERS_MAX];
+
+static uint16_t sizeArray(uint8_t *pstring);
 
 //**********************************************************************************************************
 // Funcion : bool_t uartInit()
@@ -29,7 +31,7 @@ static uint8_t rxBuff[10];
 bool_t uartInit()
 {
 	  HAL_StatusTypeDef statusInitUart;
-	  bool_t initUart;
+	  bool_t initUartRET;
 	  uint8_t stringInit[] = "*** CONFIG Serial PORT 9600 8N1 ***\n\r";
 	  UartHandle.Instance        = USARTx;
 	  UartHandle.Init.BaudRate   = 9600;
@@ -41,16 +43,16 @@ bool_t uartInit()
 	  UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
 	  statusInitUart = HAL_UART_Init(&UartHandle);
 	  if (statusInitUart != HAL_OK)
-	      initUart = false;
+	      initUartRET = false;
 	  else
 	  {
-		  initUart = true;
+		  initUartRET = true;
 		  if (HAL_UART_Transmit(&UartHandle, stringInit, (uint16_t)sizeof(stringInit), 0xFFFF) != HAL_OK)
-		  	  initUart = false;
+		  	  initUartRET = false;
 		  if (HAL_UART_Receive_IT(&UartHandle, rxBuff, COMM_LENGHT_MAX) != HAL_OK)
-			  initUart = false;
+			  initUartRET = false;
 	  }
-	  return initUart;
+	  return initUartRET;
 }
 
 //**********************************************************************************************************
@@ -87,21 +89,6 @@ void uartSendStringSize(uint8_t *pstring, uint16_t size)
 	else Error_Handler();
 }
 
-//**********************************************************************************************************
-// Funcion : void uartReceiveStringSize(uint8_t * pstring, uint16_t size)
-//			 Recibe una cantidad de caracteres de un string por la UART.
-//			 Recibe como parametro: - un puntero al string que se desea recibir.
-//			 						- una variable size que especifica la cantidad de caracteres a recibir
-//**********************************************************************************************************
-//void uartReceiveCommand(uint8_t *pstring, uint16_t size)
-//{
-//	if (pstring != NULL)
-//	{
-//		if (HAL_UART_Receive_IT(&UartHandle, pstring, size) != HAL_OK)
-//			Error_Handler();
-//	}
-//	else Error_Handler();
-//}
 
 //**********************************************************************************************************
 // Funcion : uint16_t sizeArray(uint8_t *pstring).
@@ -113,7 +100,7 @@ static uint16_t sizeArray(uint8_t *pstring)
 	uint16_t size = 0;
 	if (pstring != NULL)
 	{
-		while ((pstring[size] != '\0') && (size < CARACTERES_MAX))
+		while ((pstring[size] != '\0') && (size < CHARACTERS_MAX))
 			size++;
 	}
 	else Error_Handler();
@@ -153,9 +140,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	{
 		newCommand = true;
 		HAL_UART_Receive_IT(&UartHandle, rxBuff, COMM_LENGHT_MAX);
-		HAL_UART_Transmit(&UartHandle, rxBuff, COMM_LENGHT_MAX, 100);
+		//HAL_UART_Transmit(&UartHandle, rxBuff, COMM_LENGHT_MAX, 100); // Echo of received it
 	}
-	else HAL_GPIO_TogglePin(LED01_GPIO_Port, LED01_Pin);
 }
 
 
