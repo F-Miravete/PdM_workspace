@@ -74,8 +74,6 @@ static void MX_GPIO_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	delay_t demora;					// Defino Delay para parpadeo de Led 2
-	tick_t duracion = TIEMPO_1;		// Defino Tiempo inicial con el que arrancara el parpadeo del led 2
 
   /* USER CODE END 1 */
 
@@ -115,7 +113,6 @@ int main(void)
   // Inicializo FSM operacion del Genrador de tonos
   //*********************************************************************************************************
   waveGenFSM_init();
-  delayInit(&demora, duracion);
 
   // Bucle principal
   while (1)

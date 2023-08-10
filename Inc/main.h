@@ -83,8 +83,7 @@ void Error_Handler(void);
 #define LED03_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-#define TIEMPO_1 100
-#define TIEMPO_2 500
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

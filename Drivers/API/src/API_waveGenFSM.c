@@ -24,7 +24,6 @@ static const uint8_t comm_sCH2[] = "*CH02";
 static const uint8_t comm_cfgs[] = "*L123";
 static const uint8_t comm_back[] = "*BACK";
 
-static const uint8_t msg_play[] = "\n\r** Modo PLAY **\n\r";
 static uint8_t buffer[CHARACTERS_MAX];
 
 static waveGenFSMstate_t actualState;
@@ -74,16 +73,21 @@ void waveGenFSM_update()
 					p1 = m0;
 				else p1 = m1;
 				snprintf((char*)buffer, CHARACTERS_MAX, "\n\r**** Modo PLAY ****\n\r"
-				                                        "Frequency : %ld Hz\n\r"
-														"Channel 0 : %s Amplitude : %ld %\n\r"
-														"Channel 1 : %s Amplitude : %ld %\n\r",
+				                                        "Frequency : %d Hz\n\r"
+														"Channel 0 : %s Amplitude : %d %%\n\r"
+														"Channel 1 : %s Amplitude : %d %%\n\r",
 														ch0->freq,p0,ch0->amplitude,p1,ch1->amplitude);
 				uartSendString(buffer);
 			}
 			else
 			{
 				if(strstr((const char*)sComm, (const char*)comm_menu))
+				{
 					actualState = MENU_CONFIG;
+					snprintf((char*)buffer, CHARACTERS_MAX, "\n\r**** Modo CONFIGURACION ****\n\r"
+															"*FREQ\t*CH00\t*CH01\t*BACK\n\r");
+					uartSendString(buffer);
+				}
 			}
 		break;
 		case PLAY:
