@@ -14,10 +14,9 @@ typedef enum{										// Define estructura para FSM de Generador de tonos
 STOP,
 PLAY,
 MENU_CONFIG,
-SELECT_CH1,
-SELECT_CH2,
-CH1_CONFIG_VALID,
-CH2_CONFIG_VALID
+INPUT_AMP_CH0,
+INPUT_AMP_CH1,
+INPUT_FREQ
 } waveGenFSMstate_t;
 
 void waveGenFSM_init();
