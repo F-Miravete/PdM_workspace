@@ -9,7 +9,7 @@
 - Modulos programados
 
 ## Plataforma de desarrollo
-![alt text](PdM y PCSE.jpeg "PlacaF401RE conectada a PMOD I2S2 reproduciendo 2 señales (Senoidal + Diente de Sierra)")
+![alt text](PdM y PCSE.jpeg)
 Compilado y probado para la placa de desarrollo **ST NUCLEO-F401RE**
 
 **NOTA:** Este trabajo utiliza los perifericos I2S, UART, NVIC.
@@ -21,12 +21,12 @@ Desde la UART se opera el sistema a traves de comandos definidos y se ingresan l
 La recepcion de comandos y datos en la UART y la transmision de datos por I2S son no bloqueantes, es decir, se realizan por interrupciones.
 
 ## Diagrama en bloques
-![alt text](DiagramaBloques.jpg)
+![alt text](DiagramaBloques.JPG)
 
 ## Maquina de estado finitos
 Se implementa una maquina de estado finitos para la operacion del sistema a traves del ingreso de comandos y datos desde la UART.
 Para las pruebas se utilizó el software RealTerm.  
-![alt text](FSM.jpg)
+![alt text](FSM.JPG)
 
 
 ```C
