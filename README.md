@@ -9,7 +9,7 @@
 - Modulos programados
 
 ## Plataforma de desarrollo
-![alt text](PdM y PCSE.jpeg)
+![alt text](PdM y PCSE.jpg)
 Compilado y probado para la placa de desarrollo **ST NUCLEO-F401RE**
 
 **NOTA:** Este trabajo utiliza los perifericos I2S, UART, NVIC.
