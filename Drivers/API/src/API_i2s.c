@@ -7,18 +7,24 @@
 //**********************************************************************************************************
 
 #include "API_i2s.h"
+#include "API_waveGenFSM.h"
 #include "math.h"
 #include "main.h"
 
+#define INITIAL_FREQ 1000
+#define AMPLITUDE_MAX 100
+#define AMPLITUDE_MIN 0
+#define QUANT_CHANNELS 2
+
 static void channelsInit(void);
 static void setChannel(channel * h_ch);
+static void setSizeBuffer(uint16_t frequency);
 static void setBufferI2S();
 
 I2S_HandleTypeDef hi2s2;
 static int32_t dataBufferI2S[BUFFER_SIZE_MAX];
-static int16_t dataChannel[2][BUFFER_SIZE_MAX];
+static int16_t dataChannel[QUANT_CHANNELS][BUFFER_SIZE_MAX];
 static channel channel_0, channel_1;
-static uint16_t freq;
 static uint32_t size_buffer;
 
 bool_t i2sInit()
@@ -40,18 +46,34 @@ bool_t i2sInit()
 }
 
 //**********************************************************************************************************
+// Funcion : void setSizeBuffer(uint16_t frequency)
+//			 Funcion que calcula el tamaño del buffer que sera enviado por I2S dependiendo de la frecuencia de la señal
+//			 Recibe como parametro el valor de frecuencia en Hz
+//**********************************************************************************************************
+void setSizeBuffer(uint16_t frequency)
+{
+	size_buffer = hi2s2.Init.AudioFreq/frequency;
+	if(size_buffer > BUFFER_SIZE_MAX)
+		size_buffer = BUFFER_SIZE_MAX;
+	if(size_buffer < BUFFER_SIZE_MIN)
+		size_buffer = BUFFER_SIZE_MIN;
+	channel_0.freq = frequency;
+	channel_1.freq = frequency;
+}
+
+//**********************************************************************************************************
 // Funcion : void setChannel(channel * h_ch)
 //			 Funcion que genera las formas de onda seleccionadas para cada canal
 //			 Recibe como parametro un puntero del tipo channel que contiene los atributos de cada canal
 //**********************************************************************************************************
-static void setChannel(channel * h_ch)
+static void setChannel(channel* h_ch)
 {
 	for(uint16_t i=0;i<size_buffer;i++)
 	{
 		if(h_ch->wave_type == SINUSOIDAL)
-			dataChannel[h_ch->n_ch][i] = (h_ch->amplitude/100)*SCALE_SIN_WAVE*sinf(i*2*M_PI/size_buffer);
+			dataChannel[h_ch->n_ch][i] = (h_ch->amplitude/100.0)*SCALE_SIN_WAVE*sinf(i*2*M_PI/size_buffer);
 		if(h_ch->wave_type == SAWTOOTH)
-			dataChannel[h_ch->n_ch][i] = (h_ch->amplitude/100)*i*(SCALE_SAW_WAVE/size_buffer);
+			dataChannel[h_ch->n_ch][i] = (h_ch->amplitude/100.0)*i*(SCALE_SAW_WAVE/size_buffer);
 	}
 }
 
@@ -65,10 +87,10 @@ static void setBufferI2S()
 	int32_t aux;
 	for(uint16_t i=0;i<size_buffer;i++)
 	{
-		dataBufferI2S[i] = dataChannel[0][i];
+		dataBufferI2S[i] = dataChannel[CHANNEL_0][i];
 		aux = dataBufferI2S[i]<<16;
 		dataBufferI2S[i] = aux;
-		dataBufferI2S[i] = dataBufferI2S[i] + (int32_t)dataChannel[1][i];
+		dataBufferI2S[i] = dataBufferI2S[i] + (int32_t)dataChannel[CHANNEL_1][i];
 	}
 }
 
@@ -80,20 +102,15 @@ static void setBufferI2S()
 //**********************************************************************************************************
 static void channelsInit(void)
 {
-	freq = 1000;
-	size_buffer = hi2s2.Init.AudioFreq/freq;
-	if(size_buffer > BUFFER_SIZE_MAX)
-		size_buffer = BUFFER_SIZE_MAX;
-	if(size_buffer < BUFFER_SIZE_MIN)
-		size_buffer = BUFFER_SIZE_MIN;
-	channel_0.amplitude = 100;
-	channel_0.n_ch = 0;
+	channel_0.amplitude = AMPLITUDE_MAX;
+	channel_0.n_ch = CHANNEL_0;
 	channel_0.wave_type = SINUSOIDAL;
-	channel_0.freq = freq;
-	channel_1.amplitude = 100;
-	channel_1.n_ch = 1;
+	channel_0.freq = INITIAL_FREQ;
+	channel_1.amplitude = AMPLITUDE_MAX;
+	channel_1.n_ch = CHANNEL_1;
 	channel_1.wave_type = SAWTOOTH;
-	channel_1.freq = freq;
+	channel_1.freq = INITIAL_FREQ;
+	setSizeBuffer(INITIAL_FREQ);
 	setChannel(&channel_0);
 	setChannel(&channel_1);
 	setBufferI2S();
@@ -107,14 +124,76 @@ static void channelsInit(void)
 channel* readChannelProperty(uint8_t ch)
 {
 	channel *RET;
-	if(ch == 0)
+	if(ch == CHANNEL_0)
 		RET = &channel_0;
-	else if(ch == 1)
+	else if(ch == CHANNEL_1)
 			RET = &channel_1;
 		 else RET = NULL;
 	return RET;
 }
 
+//**********************************************************************************************************
+// Funcion : void setFreqChannels(uint16_t freq)
+//
+//
+//**********************************************************************************************************
+void setFreqChannels(uint16_t freq)
+{
+	setSizeBuffer(freq);
+	setChannel(&channel_0);
+	setChannel(&channel_1);
+	setBufferI2S();
+}
+
+//**********************************************************************************************************
+// Funcion : void setAmpChannel(uint8_t n_channel, uint8_t amplitude)
+//
+//
+//**********************************************************************************************************
+void setAmpChannel(uint8_t n_channel, uint8_t amplitude)
+{
+	if(n_channel > 1)
+		Error_Handler();
+	if(amplitude > AMPLITUDE_MAX)
+		amplitude = AMPLITUDE_MAX;
+	if(amplitude < AMPLITUDE_MIN)
+		amplitude = AMPLITUDE_MIN;
+
+	if(n_channel == CHANNEL_0)
+	{
+		channel_0.amplitude = amplitude;
+		setChannel(&channel_0);
+	}
+	if(n_channel == CHANNEL_1)
+	{
+		channel_1.amplitude = amplitude;
+		setChannel(&channel_1);
+	}
+	setBufferI2S();
+}
+
+//**********************************************************************************************************
+// Funcion : void setWaveChannel(uint8_t n_channel, uint8_t amplitude)
+//
+//
+//**********************************************************************************************************
+void setWaveChannel(uint8_t n_channel, wave_t wave_type)
+{
+	if(n_channel > 1 || n_channel < 0)
+		Error_Handler();
+
+	if(n_channel == CHANNEL_0)
+	{
+		channel_0.wave_type = wave_type;
+		setChannel(&channel_0);
+	}
+	if(n_channel == CHANNEL_1)
+	{
+		channel_1.wave_type = wave_type;
+		setChannel(&channel_1);
+	}
+	setBufferI2S();
+}
 
 //**********************************************************************************************************
 // Funcion : void startI2S(void)
@@ -135,6 +214,7 @@ void startI2S(void)
 void stopI2S(void)
 {
 	HAL_NVIC_DisableIRQ(SPI2_IRQn);
+	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
 }
 
 //**********************************************************************************************************

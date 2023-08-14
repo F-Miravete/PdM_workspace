@@ -34,10 +34,12 @@ typedef struct
 	uint16_t freq;			// 20 to 24000 [Hz]
 } channel;
 
-bool_t i2sInit();
-void startI2S(void);
-void stopI2S(void);
-channel* readChannelProperty(uint8_t ch);
-
+bool_t i2sInit();											// Inicializa el modulo I2S
+void startI2S(void);										// Arranca la transmision I2S
+void stopI2S(void);											// Detiene la transmision I2S
+channel* readChannelProperty(uint8_t ch);					// Devuelve un puntero a la estrucutura channel para cada canal
+void setFreqChannels(uint16_t freq);						// Usada cuando se ingresa un nuevo valor de frecuencia
+void setAmpChannel(uint8_t n_channel, uint8_t amplitude);	// Usada cuando se ingresa un nuevo valor de amplitud
+void setWaveChannel(uint8_t n_channel, wave_t wave_type);	// Usada cuando se ingresa una nueva forma de onda
 
 #endif /* API_INC_API_I2S_H_ */

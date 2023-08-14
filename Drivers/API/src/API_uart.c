@@ -10,11 +10,17 @@
 #include "API_uart.h"
 #include "main.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 
 UART_HandleTypeDef UartHandle;
-static bool_t newCommand = false;
+static bool_t flagNewCommand = false;
+static bool_t flagStartValue = false;
+static bool_t flagEndValue = false;
 static uint8_t rxBuff[CHARACTERS_MAX];
+static uint8_t rxData[CHARACTERS_MAX];
+static uint8_t index;
+static uint8_t sValue[VALUE_LENGTH_MAX];
 
 static uint16_t sizeArray(uint8_t *pstring);
 
@@ -49,8 +55,10 @@ bool_t uartInit()
 		  initUartRET = true;
 		  if (HAL_UART_Transmit(&UartHandle, stringInit, (uint16_t)sizeof(stringInit), 0xFFFF) != HAL_OK)
 		  	  initUartRET = false;
-		  if (HAL_UART_Receive_IT(&UartHandle, rxBuff, COMM_LENGHT_MAX) != HAL_OK)
-			  initUartRET = false;
+		  //if (HAL_UART_Receive_IT(&UartHandle, rxBuff, COMM_LENGHT_MAX) != HAL_OK)
+		  //  initUartRET = false;
+		  if (HAL_UART_Receive_IT(&UartHandle, rxBuff, 1) != HAL_OK)
+		  			  initUartRET = false;
 	  }
 	  return initUartRET;
 }
@@ -108,14 +116,26 @@ static uint16_t sizeArray(uint8_t *pstring)
 }
 
 //**********************************************************************************************************
-// Funcion : bool_t readCommand()
+// Funcion : bool_t eventCommand()
 //			 Devuelve verdadero si la USART recibio un comando
 //			 Recibe como parametro: -
 //**********************************************************************************************************
 bool_t eventCommand()
 {
-	bool_t flag = newCommand;
-	newCommand = false;
+	bool_t flag = flagNewCommand;
+	flagNewCommand = false;
+	return flag;
+}
+
+//**********************************************************************************************************
+// Funcion : bool_t eventValue()
+//			 Devuelve verdadero si la USART recibio un valor
+//			 Recibe como parametro: -
+//**********************************************************************************************************
+bool_t eventValue()
+{
+	bool_t flag = flagEndValue;
+	flagEndValue = false;
 	return flag;
 }
 
@@ -126,8 +146,33 @@ bool_t eventCommand()
 //**********************************************************************************************************
 uint8_t* readCommand()
 {
-	return rxBuff;
+	return rxData;
 }
+
+//**********************************************************************************************************
+// Funcion : uint16_t readValue()
+//			 Devuelve el valor ingresado
+//			 Recibe como parametro: -
+//**********************************************************************************************************
+uint16_t readValue()
+{
+	uint8_t i;
+	uint16_t valor;
+	for(i=0;i<(index-1);i++)
+		sValue[i] = rxData[i];
+	sValue[i] = 0;
+	valor = (uint16_t)atoi((const char*)sValue);
+	return valor;
+}
+
+
+//value_t readValue()
+//{
+//	value_t RET;
+//	RET.n_digits = index - 1;
+//	RET.pointer_value = rxData;
+//	return RET;
+//}
 
 //**********************************************************************************************************
 // Funcion : void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
@@ -138,9 +183,38 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if(huart->Instance == USARTx)
 	{
-		newCommand = true;
-		HAL_UART_Receive_IT(&UartHandle, rxBuff, COMM_LENGHT_MAX);
+		//newCommand = true;
+		//HAL_UART_Receive_IT(&UartHandle, rxBuff, COMM_LENGHT_MAX);
 		//HAL_UART_Transmit(&UartHandle, rxBuff, COMM_LENGHT_MAX, 100); // Echo of received it
+		uint8_t charData = rxBuff[0];
+		rxData[index++] = charData;
+		if(index >= CHARACTERS_MAX)
+			index = 0;
+		// -------------------------------------------------------------------------------------------------
+		// Verifica si se envia un comando
+		// -------------------------------------------------------------------------------------------------
+		if(charData == '*')
+			index = 0;
+		if(index >= COMM_LENGTH_MAX)
+		{
+			flagNewCommand = true;
+		}
+		// -------------------------------------------------------------------------------------------------
+		// Verifica si se envia un valor
+		// -------------------------------------------------------------------------------------------------
+		if(flagStartValue)
+			if(charData == ')')
+			{
+				flagEndValue = true;
+				flagStartValue = false;
+			}
+		if(charData == '(')
+		{
+			index = 0;
+			flagStartValue = true;
+		}
+
+		HAL_UART_Receive_IT(&UartHandle, rxBuff, 1);
 	}
 }
 
