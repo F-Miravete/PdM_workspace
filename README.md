@@ -1,26 +1,33 @@
-# Practica 5 - Programacion de Microcontroladores (CESE 2023)
+# TP Final - CESE 2023 
+# Programacion de Microcontroladores y Protocolos de Comunicacion en S.E.
 
 ## RESUMEN
 - Plataforma de desarrollo 
-- Objetivos
-- Ubicacion de archivos
-- Variables y macros
-- Funciones implementadas
+- Descripcion del trabajo
+- Diagrama en bloques
+- Maquina de estado para la operacion
+- Modulos programados
 
 ## Plataforma de desarrollo
-![alt text](PlacaF401RE_Pract4.jpeg "Placa")
+![alt text](PdM y PCSE.jpeg "PlacaF401RE conectada a PMOD I2S2 reproduciendo 2 señales (Senoidal + Diente de Sierra)")
 Compilado y probado para la placa de desarrollo **ST NUCLEO-F401RE**
 
-**NOTA:** Este ejercicio utiliza las salidas GPIOB pin 7,8 y 9 cableadas a 3 leds externos.
-		  Utiliza el puerto serie por default, a traves del cable USB y requiere
-		  un emulador de puerto serie para recibir los mensajes enviados (CuteCom por ej.)
+**NOTA:** Este trabajo utiliza los perifericos I2S, UART, NVIC.
 
-## Objetivos
+## Descripcion del trabajo
+Desde el periferico I2S se transmite en PCM 2 señales de onda seleccionables en forma, frecuencia y amplitud.
+Las señales son convertidas de digital a analogico a traves del modulos PmodI2S2 de digilent.
+Desde la UART se opera el sistema a traves de comandos definidos y se ingresan los valores de forma, frecuencia y amplitud.
+La recepcion de comandos y datos en la UART y la transmision de datos por I2S son no bloqueantes, es decir, se realizan por interrupciones.
 
-Implementar un módulo de software en un archivo fuente API_uart.c con su correspondiente 
-archivo de cabecera API_uart.h y ubicarlos en el proyecto dentro de las carpetas 
-/drivers/API/src y /drivers/API/inc, respectivamente.
-En API_uart.h se deben ubicar los prototipos de las funciones públicas.
+## Diagrama en bloques
+![alt text](DiagramaBloques.jpg)
+
+## Maquina de estado finitos
+Se implementa una maquina de estado finitos para la operacion del sistema a traves del ingreso de comandos y datos desde la UART.
+Para las pruebas se utilizó el software RealTerm.  
+![alt text](FSM.jpg)
+
 
 ```C
 bool_t uartInit();
