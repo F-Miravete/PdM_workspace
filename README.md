@@ -31,30 +31,30 @@ Para las pruebas se utilizó el software RealTerm.
 ![alt text](FSM.JPG)
 
 ```mermaid
-stateDiagram-v2;
-	[*]-->STOP;
-    STOP-->PLAY;
-    PLAY-->STOP;
-    STOP-->MENU;
-    MENU-->STOP;
-    MENU-->FREQ;
-    FREQ-->MENU;
-    MENU-->CH00;
-    CH00-->MENU;
-    MENU-->CH01;
-    CH01-->MENU;
-    CH00-->AMP0;
-    AMP0-->CH00;
-    AMP0-->MENU;
-    CH00-->WAV0;
-    WAV0-->CH00;
-    WAV0-->MENU;
-    CH01-->AMP1;
-    AMP1-->CH01;
-    AMP1-->MENU;
-    CH01-->WAV1;
-    WAV1-->CH01;
-    WAV1-->MENU;    
+stateDiagram
+	[*]-->STOP
+    STOP-->PLAY
+    PLAY-->STOP
+    STOP-->MENU
+    MENU-->STOP
+    MENU-->FREQ
+    FREQ-->MENU
+    MENU-->CH00
+    CH00-->MENU
+    MENU-->CH01
+    CH01-->MENU
+    CH00-->AMP0
+    AMP0-->CH00
+    AMP0-->MENU
+    CH00-->WAV0
+    WAV0-->CH00
+    WAV0-->MENU
+    CH01-->AMP1
+    AMP1-->CH01
+    AMP1-->MENU
+    CH01-->WAV1
+    WAV1-->CH01    
+    WAV1-->MENU    
 ```
 
 ## Modulos programados
