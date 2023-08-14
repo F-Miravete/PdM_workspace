@@ -31,8 +31,8 @@ Para las pruebas se utilizó el software RealTerm.
 ![alt text](FSM.JPG)
 
 ```mermaid
-graph TD;
-	RESET-->STOP;
+stateDiagram-v2;
+	[*]-->STOP;
     STOP-->PLAY;
     PLAY-->STOP;
     STOP-->MENU;
