@@ -17,7 +17,7 @@ Compilado y probado para la placa de desarrollo **ST NUCLEO-F401RE**
 
 ## Descripcion del trabajo
 Desde el periferico I2S se transmite en PCM 2 señales de onda seleccionables en forma, frecuencia y amplitud.
-Las señales son convertidas de digital a analogico a traves del modulos PmodI2S2 de digilent.
+Las señales son convertidas de digital a analogico a traves del modulos PmodI2S2 de Digilent (https://digilent.com/shop/pmod-i2s2-stereo-audio-input-and-output/)
 Desde la UART se opera el sistema a traves de comandos definidos y se ingresan los valores de forma, frecuencia y amplitud.
 La recepcion de comandos y datos en la UART y la transmision de datos por I2S son no bloqueantes, es decir, se realizan por interrupciones.
 
@@ -29,6 +29,33 @@ Se implementa una maquina de estado finitos para la operacion del sistema a trav
 Para las pruebas se utilizó el software RealTerm. 
  
 ![alt text](FSM.JPG)
+
+```mermaid
+graph TD;
+	RESET-->STOP;
+    STOP-->PLAY;
+    PLAY-->STOP;
+    STOP-->MENU;
+    MENU-->STOP;
+    MENU-->FREQ;
+    FREQ-->MENU;
+    MENU-->CH00;
+    CH00-->MENU;
+    MENU-->CH01;
+    CH01-->MENU;
+    CH00-->AMP0;
+    AMP0-->CH00;
+    AMP0-->MENU;
+    CH00-->WAV0;
+    WAV0-->CH00;
+    WAV0-->MENU;
+    CH01-->AMP1;
+    AMP1-->CH01;
+    AMP1-->MENU;
+    CH01-->WAV1;
+    WAV1-->CH01;
+    WAV1-->MENU;    
+```
 
 ## Modulos programados
 
