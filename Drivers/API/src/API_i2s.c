@@ -1,7 +1,7 @@
 //**********************************************************************************************************
 //
-// Programacion de Microcontroladores (CESE 2023)
-// Titulo: MODULO I2S
+// TP Final PdM y PCSE (CESE 2023)
+// Titulo: Modulo API_i2s (SOURCE)
 // Autor: F.D.M.
 //
 //**********************************************************************************************************
@@ -27,6 +27,11 @@ static int16_t dataChannel[QUANT_CHANNELS][BUFFER_SIZE_MAX];
 static channel channel_0, channel_1;
 static uint32_t size_buffer;
 
+//**********************************************************************************************************
+// Funcion : bool_t i2sInit()
+//			 Funcion que inicializa el periferico I2S2
+//			 Retorno True si la inicializacion fue exitosa
+//**********************************************************************************************************
 bool_t i2sInit()
 {
   bool_t flag_RET = true;
@@ -50,7 +55,7 @@ bool_t i2sInit()
 //			 Funcion que calcula el tamaño del buffer que sera enviado por I2S dependiendo de la frecuencia de la señal
 //			 Recibe como parametro el valor de frecuencia en Hz
 //**********************************************************************************************************
-void setSizeBuffer(uint16_t frequency)
+static void setSizeBuffer(uint16_t frequency)
 {
 	size_buffer = hi2s2.Init.AudioFreq/frequency;
 	if(size_buffer > BUFFER_SIZE_MAX)
@@ -68,13 +73,17 @@ void setSizeBuffer(uint16_t frequency)
 //**********************************************************************************************************
 static void setChannel(channel* h_ch)
 {
-	for(uint16_t i=0;i<size_buffer;i++)
+	if(h_ch != NULL)
 	{
-		if(h_ch->wave_type == SINUSOIDAL)
-			dataChannel[h_ch->n_ch][i] = (h_ch->amplitude/100.0)*SCALE_SIN_WAVE*sinf(i*2*M_PI/size_buffer);
-		if(h_ch->wave_type == SAWTOOTH)
-			dataChannel[h_ch->n_ch][i] = (h_ch->amplitude/100.0)*i*(SCALE_SAW_WAVE/size_buffer);
+		for(uint16_t i=0;i<size_buffer;i++)
+		{
+			if(h_ch->wave_type == SINUSOIDAL)
+				dataChannel[h_ch->n_ch][i] = (h_ch->amplitude/100.0)*SCALE_SIN_WAVE*sinf(i*2*M_PI/size_buffer);
+			if(h_ch->wave_type == SAWTOOTH)
+				dataChannel[h_ch->n_ch][i] = (h_ch->amplitude/100.0)*i*(SCALE_SAW_WAVE/size_buffer);
+		}
 	}
+	else Error_Handler();
 }
 
 //**********************************************************************************************************
@@ -117,9 +126,9 @@ static void channelsInit(void)
 }
 
 //**********************************************************************************************************
-// Funcion :
-//
-//
+// Funcion : channel* readChannelProperty(uint8_t ch)
+//			 Funcion que devuelve un puntero a la estructura que define los parametros de cada canal
+//			 Recibe como parametro el numero de canal
 //**********************************************************************************************************
 channel* readChannelProperty(uint8_t ch)
 {
@@ -134,11 +143,15 @@ channel* readChannelProperty(uint8_t ch)
 
 //**********************************************************************************************************
 // Funcion : void setFreqChannels(uint16_t freq)
-//
-//
+//			Funcion que ajusta el tamaño de los datos de cada canal y el buffer I2S para un valor de frecuencia determinado
+//			Recibe como parametro el valor de frecuencia en Hz
 //**********************************************************************************************************
 void setFreqChannels(uint16_t freq)
 {
+	if(freq > FREQ_MAX)
+		freq = FREQ_MAX;
+	if(freq < FREQ_MIN)
+		freq = FREQ_MIN;
 	setSizeBuffer(freq);
 	setChannel(&channel_0);
 	setChannel(&channel_1);
@@ -147,12 +160,12 @@ void setFreqChannels(uint16_t freq)
 
 //**********************************************************************************************************
 // Funcion : void setAmpChannel(uint8_t n_channel, uint8_t amplitude)
-//
-//
+//			Funcion que modifica la amplitud de un canal
+//			Recibe como parametro el numero de canal y el valor de amplitud
 //**********************************************************************************************************
 void setAmpChannel(uint8_t n_channel, uint8_t amplitude)
 {
-	if(n_channel > 1)
+	if(n_channel != CHANNEL_0 && n_channel != CHANNEL_1)
 		Error_Handler();
 	if(amplitude > AMPLITUDE_MAX)
 		amplitude = AMPLITUDE_MAX;
@@ -174,12 +187,12 @@ void setAmpChannel(uint8_t n_channel, uint8_t amplitude)
 
 //**********************************************************************************************************
 // Funcion : void setWaveChannel(uint8_t n_channel, uint8_t amplitude)
-//
-//
+//			Funcion que define el tipo de señal de un canal
+//			Recibe como parametros el numero de canal .y la forma de señal
 //**********************************************************************************************************
 void setWaveChannel(uint8_t n_channel, wave_t wave_type)
 {
-	if(n_channel > 1 || n_channel < 0)
+	if(n_channel != CHANNEL_0 && n_channel != CHANNEL_1)
 		Error_Handler();
 
 	if(n_channel == CHANNEL_0)
@@ -203,7 +216,8 @@ void setWaveChannel(uint8_t n_channel, wave_t wave_type)
 void startI2S(void)
 {
 	HAL_NVIC_EnableIRQ(SPI2_IRQn);
-	HAL_I2S_Transmit_IT(&hi2s2, (uint16_t*)dataBufferI2S, size_buffer*2);
+	if(HAL_I2S_Transmit_IT(&hi2s2, (uint16_t*)dataBufferI2S, size_buffer*2) != HAL_OK)
+		Error_Handler();
 }
 
 //**********************************************************************************************************

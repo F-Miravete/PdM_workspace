@@ -1,7 +1,7 @@
 //**********************************************************************************************************
 //
-// Programacion de Microcontroladores (CESE 2023)
-// Titulo: UART (SOURCE)
+// TP Final PdM y PCSE (CESE 2023)
+// Titulo: Modulo API_uart (SOURCE)
 // Autor: F.D.M.
 //
 //**********************************************************************************************************
@@ -55,10 +55,8 @@ bool_t uartInit()
 		  initUartRET = true;
 		  if (HAL_UART_Transmit(&UartHandle, stringInit, (uint16_t)sizeof(stringInit), 0xFFFF) != HAL_OK)
 		  	  initUartRET = false;
-		  //if (HAL_UART_Receive_IT(&UartHandle, rxBuff, COMM_LENGHT_MAX) != HAL_OK)
-		  //  initUartRET = false;
 		  if (HAL_UART_Receive_IT(&UartHandle, rxBuff, 1) != HAL_OK)
-		  			  initUartRET = false;
+			  initUartRET = false;
 	  }
 	  return initUartRET;
 }
@@ -141,7 +139,7 @@ bool_t eventValue()
 
 //**********************************************************************************************************
 // Funcion : uint8_t * readCommand()
-//			 Devuelve puntero al comando ingresado
+//			 Devuelve puntero al buffer donde se guardan los datos ingresados por UART
 //			 Recibe como parametro: -
 //**********************************************************************************************************
 uint8_t* readCommand()
@@ -165,15 +163,6 @@ uint16_t readValue()
 	return valor;
 }
 
-
-//value_t readValue()
-//{
-//	value_t RET;
-//	RET.n_digits = index - 1;
-//	RET.pointer_value = rxData;
-//	return RET;
-//}
-
 //**********************************************************************************************************
 // Funcion : void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 //			 Rutina de atencion cuando ingresa interrupcion
@@ -183,9 +172,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if(huart->Instance == USARTx)
 	{
-		//newCommand = true;
-		//HAL_UART_Receive_IT(&UartHandle, rxBuff, COMM_LENGHT_MAX);
-		//HAL_UART_Transmit(&UartHandle, rxBuff, COMM_LENGHT_MAX, 100); // Echo of received it
 		uint8_t charData = rxBuff[0];
 		rxData[index++] = charData;
 		if(index >= CHARACTERS_MAX)

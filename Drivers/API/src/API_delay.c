@@ -1,12 +1,13 @@
 //**********************************************************************************************************
 //
-// Practica 3 - Programacion de Microcontroladores (CESE 2023)
+// TP Final PdM y PCSE (CESE 2023)
 // Titulo: Modulo API_delay (SOURCE)
 // Autor: F.D.M.
 //
 //**********************************************************************************************************
 
 #include "API_delay.h"
+#include "main.h"
 
 //*******************************************************************************************************************
 // Funcion: delayInit()
@@ -23,7 +24,7 @@ void delayInit( delay_t * delay, tick_t duration )
 			duration = DURATION_MIN;
 		delay->duration = duration;
 	}
-	else API_Error_Handler();
+	else Error_Handler();
 }
 
 //*******************************************************************************************************************
@@ -51,7 +52,7 @@ bool_t delayRead( delay_t * delay )
 			}
 		}
 	}
-	else API_Error_Handler();
+	else Error_Handler();
 	return time_end;
 }
 
@@ -69,20 +70,7 @@ void delayWrite( delay_t * delay, tick_t duration )
 			duration = DURATION_MIN;
 		delay->duration = duration;
 	}
-	else API_Error_Handler();
+	else Error_Handler();
 }
 
-//**********************************************************************************************************
-// Funcion: API_Error_Handler()
-// Manejo de errores por pasaje de parametros en modulo API_delay, si existe un error enciende led de
-// usuario LD2
-//**********************************************************************************************************
-void API_Error_Handler(void)
-{
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
-
-	while (1)
-	{
-	}
-}
 

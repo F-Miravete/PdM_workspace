@@ -1,10 +1,10 @@
-/*
- * API_i2s.h
- *
- *  Created on: Aug 9, 2023
- *      Author: z002m07j
- */
-
+//**********************************************************************************************************
+//
+// TP Final PdM y PCSE (CESE 2023)
+// Titulo: Modulo API_i2s (HEADER)
+// Autor: F.D.M.
+//
+//**********************************************************************************************************
 
 #ifndef API_INC_API_I2S_H_
 #define API_INC_API_I2S_H_
@@ -13,9 +13,11 @@
 #include "API_delay.h"
 
 // Freq. sampling 96000 Hz
-// Freq. Min. 10 Hz - Freq. Max. 24000 Hz
+// Freq. Min. 20 Hz - Freq. Max. 24000 Hz
 // Buffer size min. -> 96000/24000 = 4
 // Buffer size max. -> 96000/20 = 4800
+#define FREQ_MAX 24000
+#define FREQ_MIN 20
 #define BUFFER_SIZE_MAX 4800
 #define BUFFER_SIZE_MIN 4
 #define SCALE_SIN_WAVE 16383

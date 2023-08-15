@@ -1,6 +1,6 @@
 //**********************************************************************************************************
 //
-// Practica 4 - Programacion de Microcontroladores (CESE 2023)
+// TP Final PdM y PCSE (CESE 2023)
 // Titulo: Modulo API_delay (HEADER)
 // Autor: F.D.M.
 //
@@ -30,6 +30,5 @@ typedef struct{						// Define estructura para el manejo de retardos
 void delayInit( delay_t * delay, tick_t duration );
 bool_t delayRead( delay_t * delay );
 void delayWrite( delay_t * delay, tick_t duration );
-void API_Error_Handler(void);
 
 #endif

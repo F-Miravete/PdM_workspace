@@ -30,33 +30,6 @@ Para las pruebas se utilizó el software RealTerm.
  
 ![alt text](FSM.JPG)
 
-```mermaid
-stateDiagram
-	[*]-->STOP
-    STOP-->PLAY: comPLAY
-    PLAY-->STOP: comSTOP
-    STOP-->MENU: comMENU
-    MENU-->STOP: comBACK
-    MENU-->FREQ: comFREQ
-    FREQ-->MENU: ValueIN or comBACK
-    MENU-->CH00: comCH00
-    CH00-->MENU: comBACK
-    MENU-->CH01: comCH01
-    CH01-->MENU: comBACK
-    CH00-->AMP0: comAMP0
-    AMP0-->CH00: ValueNOValid or comBACK
-    AMP0-->MENU: ValueValid
-    CH00-->WAV0: comWAV0
-    WAV0-->CH00: ValueNOValid or comBACK
-    WAV0-->MENU: ValueValid
-    CH01-->AMP1: comAMP1
-    AMP1-->CH01: ValueNOValid or comBACK
-    AMP1-->MENU: ValueValid
-    CH01-->WAV1: comWAV1
-    WAV1-->CH01: ValueNOValid or comBACK
-    WAV1-->MENU: ValueValid   
-```
-
 ## Modulos programados
 
 | Modulo | Descripcion |

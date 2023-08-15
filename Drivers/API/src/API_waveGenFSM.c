@@ -1,9 +1,10 @@
-/*
- * waveGenFSM.c
- *
- *  Created on: Aug 3, 2023
- *      Author: fm
- */
+//**********************************************************************************************************
+//
+// TP Final PdM y PCSE (CESE 2023)
+// Titulo: Modulo API_waveGenFSM (SOURCE)
+// Autor: F.D.M.
+//
+//**********************************************************************************************************
 
 #include "API_i2s.h"
 #include "API_waveGenFSM.h"
@@ -13,27 +14,28 @@
 #include "string.h"
 #include "stdio.h"
 
-static uint8_t  sComm[COMM_LENGTH_MAX];      // = {0,0,0,0};
-static uint8_t* pComm;
+static uint8_t  sComm[COMM_LENGTH_MAX];  		// Arreglo que contiene el comando ingresado por UART
+static uint8_t* pComm;							// Puntero auxiliar para el ingreso de comandos por UART
 static uint8_t  i;
 static uint16_t newValue;
-static uint8_t buffer[CHARACTERS_MAX];
+static uint8_t buffer[CHARACTERS_MAX];			// Arreglo aux. para enviar mensajes de texto por UART
 static waveGenFSMstate_t actualState;
 
-static const uint8_t comm_play[] = "PLAY";
-static const uint8_t comm_stop[] = "STOP";
-static const uint8_t comm_menu[] = "MENU";
-static const uint8_t comm_sCH0[] = "CH00";
-static const uint8_t comm_sCH1[] = "CH01";
-static const uint8_t comm_freq[] = "FREQ";
-static const uint8_t comm_back[] = "BACK";
-static const uint8_t comm_amp0[] = "AMP0";
-static const uint8_t comm_amp1[] = "AMP1";
-static const uint8_t comm_wav0[] = "WAV0";
-static const uint8_t comm_wav1[] = "WAV1";
-static const uint8_t comm_sine[] = "SINE";
-static const uint8_t comm_sawt[] = "SAWT";
+static const uint8_t comm_play[] = "PLAY";		// Arreglo cte. comando PLAY
+static const uint8_t comm_stop[] = "STOP";		// Arreglo cte. comando STOP
+static const uint8_t comm_menu[] = "MENU";		// Arreglo cte. comando MENU
+static const uint8_t comm_sCH0[] = "CH00";		// Arreglo cte. comando CH00
+static const uint8_t comm_sCH1[] = "CH01";		// Arreglo cte. comando CH01
+static const uint8_t comm_freq[] = "FREQ";		// Arreglo cte. comando FREQ
+static const uint8_t comm_back[] = "BACK";		// Arreglo cte. comando BACK
+static const uint8_t comm_amp0[] = "AMP0";		// Arreglo cte. comando AMP0
+static const uint8_t comm_amp1[] = "AMP1";		// Arreglo cte. comando AMP1
+static const uint8_t comm_wav0[] = "WAV0";		// Arreglo cte. comando WAV0
+static const uint8_t comm_wav1[] = "WAV1";		// Arreglo cte. comando WAV1
+static const uint8_t comm_sine[] = "SINE";		// Arreglo cte. comando SINE
+static const uint8_t comm_sawt[] = "SAWT";		// Arreglo cte. comando SAWT
 
+// Mensajes cte. utilizados por UART
 static const uint8_t msg_menu[] = "\n\r************ Menu CONFIGURATION ************\n\r*FREQ\t*CH00\t*CH01\t*BACK\n\r";
 static const uint8_t msg_stop[] = "\n\r************** Status STOP **************\n\r*PLAY\t*MENU\n\r";
 static const uint8_t msg_freq[] = "\n\rInput Frequency in Hz (20 to 24000, use brackets) or *BACK : ";
@@ -46,8 +48,8 @@ static void printUart(const uint8_t* msg);
 static void cleanComm();
 
 //**********************************************************************************************************
-// Funcion :
-//
+// Funcion : void waveGenFSM_init()
+//			Funcion que inicializa la FSM
 //
 //**********************************************************************************************************
 void waveGenFSM_init()
@@ -58,8 +60,8 @@ void waveGenFSM_init()
 }
 
 //**********************************************************************************************************
-// Funcion :
-//
+// Funcion : void waveGenFSM_update()
+//			Funcion que actualiza la maquina de estados
 //
 //**********************************************************************************************************
 void waveGenFSM_update()
@@ -77,7 +79,6 @@ void waveGenFSM_update()
 		for(i=0;i<COMM_LENGTH_MAX;i++)
 			sComm[i] = *pComm++;
 	}
-
 
 	switch (actualState)
 	{
@@ -315,20 +316,30 @@ void waveGenFSM_update()
 	}
 }
 
+//**********************************************************************************************************
+// Funcion : static void printUart(const uint8_t* msg)
+//			 Envia un string por la UART con formato.
+//			 Recibe como parametro: - un puntero al string que se desea enviar.
+//**********************************************************************************************************
 static void printUart(const uint8_t* msg)
 {
-	uint8_t buffer[CHARACTERS_MAX];
-	snprintf((char*)buffer, CHARACTERS_MAX, (const char*)msg);
-	uartSendString(buffer);
+	if(msg != NULL)
+	{
+		uint8_t buffer[CHARACTERS_MAX];
+		snprintf((char*)buffer, CHARACTERS_MAX, (const char*)msg);
+		uartSendString(buffer);
+	}
+	else Error_Handler();
 }
 
-
+//**********************************************************************************************************
+// Funcion : static void cleanComm()
+//			 Limpia arreglo que contiene el comando ingresado por UART
+//			 Recibe como parametro: -
+//**********************************************************************************************************
 static void cleanComm()
 {
 	uint8_t i;
 	for(i=0;i<COMM_LENGTH_MAX;i++)
 		sComm[i] = 0;
 }
-
-
-
