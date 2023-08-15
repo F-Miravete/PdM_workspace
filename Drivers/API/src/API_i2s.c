@@ -40,7 +40,7 @@ bool_t i2sInit()
   hi2s2.Init.Standard = I2S_STANDARD_MSB;
   hi2s2.Init.DataFormat = I2S_DATAFORMAT_16B_EXTENDED;
   hi2s2.Init.MCLKOutput = I2S_MCLKOUTPUT_ENABLE;
-  hi2s2.Init.AudioFreq = I2S_AUDIOFREQ_96K;
+  hi2s2.Init.AudioFreq = I2S_AUDIOFREQ_96K; //I2S_AUDIOFREQ_48K - I2S_AUDIOFREQ_96K
   hi2s2.Init.CPOL = I2S_CPOL_LOW;
   hi2s2.Init.ClockSource = I2S_CLOCK_PLL;
   hi2s2.Init.FullDuplexMode = I2S_FULLDUPLEXMODE_DISABLE;
