@@ -5,9 +5,10 @@
 - Plataforma de desarrollo 
 - Descripcion del trabajo
 - Diagrama en bloques
-- Maquina de estado para la operacion
+- Maquina de estado finitos
 - Modulos programados
 - Ubicacion y archivos
+- Funciones Implementadas
 
 ## Plataforma de desarrollo
 ![alt text](PdMyPCSE.jpg)

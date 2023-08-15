@@ -47,6 +47,7 @@ static const uint8_t msg_wave[] = "\n\r************ SET WAVE FORM ************\n
 static void printUart(const uint8_t* msg);
 static void cleanComm();
 
+
 //**********************************************************************************************************
 // Funcion : void waveGenFSM_init()
 //			Funcion que inicializa la FSM
@@ -72,7 +73,7 @@ void waveGenFSM_update()
 	uint8_t m1[] = "SAWTOOTH";
 	uint8_t *p0, *p1;
 
-	// Verificacion si arribó un comando
+// Verificacion si arribó un comando
 	if(eventCommand())
 	{
 		pComm = readCommand();
@@ -98,7 +99,8 @@ void waveGenFSM_update()
 				snprintf((char*)buffer, CHARACTERS_MAX, "\n\r************** Status PLAY **************\n\r"
 				                                        "Frequency : %d Hz\n\r"
 														"Channel 0 : %s Amplitude : %d %%\n\r"
-														"Channel 1 : %s Amplitude : %d %%\n\r",
+														"Channel 1 : %s Amplitude : %d %%\n\r"
+														"*STOP\n\r",
 														ch0->freq,p0,ch0->amplitude,p1,ch1->amplitude);
 				uartSendString(buffer);
 				cleanComm();

@@ -216,8 +216,7 @@ void setWaveChannel(uint8_t n_channel, wave_t wave_type)
 void startI2S(void)
 {
 	HAL_NVIC_EnableIRQ(SPI2_IRQn);
-	if(HAL_I2S_Transmit_IT(&hi2s2, (uint16_t*)dataBufferI2S, size_buffer*2) != HAL_OK)
-		Error_Handler();
+	HAL_I2S_Transmit_IT(&hi2s2, (uint16_t*)dataBufferI2S, size_buffer*2);
 }
 
 //**********************************************************************************************************
