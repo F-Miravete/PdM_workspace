@@ -9,7 +9,6 @@
 #include "API_delay.h"
 #include "API_uart.h"
 #include "main.h"
-#include <stdio.h>
 #include <stdlib.h>
 
 

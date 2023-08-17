@@ -319,7 +319,9 @@ void waveGenFSM_update()
 		break;
 
 		default:
-
+			actualState = STOP;
+			HAL_NVIC_DisableIRQ(SPI2_IRQn);
+			printUart(msg_stop);
 		break;
 	}
 }
