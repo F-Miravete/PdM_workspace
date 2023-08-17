@@ -227,7 +227,6 @@ void startI2S(void)
 void stopI2S(void)
 {
 	HAL_NVIC_DisableIRQ(SPI2_IRQn);
-	HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, 0);
 }
 
 //**********************************************************************************************************
@@ -240,6 +239,5 @@ void HAL_I2S_TxCpltCallback(I2S_HandleTypeDef *hi2s)
 	if(hi2s->Instance == SPI2)
 	{
 		HAL_I2S_Transmit_IT(&hi2s2, (uint16_t*)dataBufferI2S, size_buffer*2);
-		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 	}
 }
